@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EBD</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(45deg, #e0f7fa, #fff176);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      min-height: 100vh;
+    }
+    .container {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    h1 {
+      color: #2196F3;
+      font-size: 32px;
+      margin: 10px 0;
+    }
+    .daily-verse {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      margin: 15px auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      max-width: 90%;
+    }
+    .menu-container {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding: 10px;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
+      white-space: nowrap;
+      gap: 15px;
+      min-width: 100%;
+    }
+    .menu {
+      display: flex;
+      flex-direction: row;
+      gap: 15px;
+    }
+    .menu button {
+      padding: 18px 30px;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 20px;
+      cursor: pointer;
+      flex: 0 0 auto;
+      min-width: 140px;
+      scroll-snap-align: start;
+      transition: transform 0.3s ease, filter 0.3s ease;
+    }
+    .menu button:hover {
+      transform: scale(1.05);
+      filter: brightness(1.1);
+    }
+    .menu button:nth-child(1) { background-color: #2196F3; } /* Clases */
+    .menu button:nth-child(2) { background-color: #4CAF50; } /* Historias */
+    .menu button:nth-child(3) { background-color: #FF9800; } /* Quiz */
+    .menu button:nth-child(4) { background-color: #9C27B0; } /* Asistencia */
+    .menu button:nth-child(5) { background-color: #E91E63; } /* InstaKids */
+    .menu button:nth-child(6) { background-color: #607D8B; } /* Admin */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 15px;
+      border-radius: 10px;
+      max-width: 95%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .class-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .class-buttons button {
+      background-color: #2196F3;
+      padding: 8px 16px;
+      border-radius: 10px;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .class-buttons button.active {
+      background-color: #ff9800;
+    }
+    .content-container {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding: 10px;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
+    }
+    #instakids-home-content {
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      max-height: 50vh; /* Limitar la altura para que no interfiera con otros elementos */
+      padding: 10px;
+      scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
+      margin: 10px auto;
+      max-width: 90%;
+    }
+    .content-card {
+      width: 100%;
+      margin: 10px 0;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      min-width: 250px;
+    }
+    #instakids-content .content-card {
+      flex: 0 0 85%; /* Mantener desplazamiento horizontal en el modal */
+      margin: 5px;
+      scroll-snap-align: start;
+    }
+    .content-card h3 {
+      color: #2196F3;
+      margin: 0 0 10px 0;
+    }
+    .content-card p {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
+    }
+    .content-card button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      color: white;
+      margin: 5px;
+    }
+    iframe {
+      width: 100%;
+      height: 150px;
+      border-radius: 10px;
+      margin: 10px 0;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
+      margin: 10px 0;
+    }
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .quiz-options button {
+      background-color: #2196F3;
+      padding: 10px;
+      border-radius: 5px;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .quiz-options button.correct { background-color: #4caf50; }
+    .quiz-options button.incorrect { background-color: #e91e63; }
+    .quiz-result {
+      color: #e91e63;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    #instakids-share-form, #asistencia-form {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      margin: 10px auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      max-width: 90%;
+    }
+    #asistencia-stats {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      margin: 10px auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      max-width: 90%;
+      text-align: left;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 5px;
+      border: 1px solid #2196F3;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #4caf50;
+      color: white;
+      padding: 8px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      margin: 5px;
+    }
+    #logout-btn, #delete-btn, #reset-btn {
+      background-color: #e91e63;
+    }
+    @media (max-width: 600px) {
+      h1 { font-size: 24px; }
+      .content-card { min-width: 200px; }
+      #instakids-home-content .content-card { width: 100%; }
+      .modal-content { padding: 10px; max-width: 98%; }
+      iframe { height: 120px; }
+      .menu button {
+        font-size: 18px;
+        padding: 15px 25px;
+        min-width: 120px;
+      }
+      body {
+        background-size: cover;
+        background-position: center;
+        background-attachment: scroll;
+      }
+      #instakids-home-content {
+        max-height: 60vh; /* Ajustar altura en móviles */
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>¡EBD!</h1>
+    <div class="daily-verse" id="daily-verse">
+      <h2>Versículo Diario</h2>
+      <p id="daily-verse-text"></p>
+    </div>
+    <div class="menu-container">
+      <div class="menu">
+        <button onclick="openModal('clases')">📚 Clases</button>
+        <button onclick="openModal('historias')">🎥 Historias</button>
+        <button onclick="openModal('quiz')">🎮 Quiz</button>
+        <button onclick="openModal('asistencia')">📋 Asistencia</button>
+        <button onclick="openModal('instakids')">📷 InstaKids</button>
+        <button onclick="openModal('admin')">🔐 Admin</button>
+      </div>
+    </div>
+    <div id="instakids-home-content" class="instakids-home-content"></div>
+    <div id="clases-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('clases-modal')">&times;</span>
+        <h2>Clases Bíblicas</h2>
+        <div class="class-buttons">
+          <button onclick="showClassContent('contenido')" id="btn-contenido">Clase</button>
+          <button onclick="showClassContent('versiculo')" id="btn-versiculo">Versículo</button>
+          <button onclick="showClassContent('actividades')" id="btn-actividades">Actividades</button>
+          <button onclick="showClassContent('oracion')" id="btn-oracion">Oración</button>
+        </div>
+        <div id="clases-content" class="content-container"></div>
+      </div>
+    </div>
+    <div id="historias-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('historias-modal')">&times;</span>
+        <h2>Historias Bíblicas</h2>
+        <div id="historias-content" class="content-container"></div>
+      </div>
+    </div>
+    <div id="quiz-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('quiz-modal')">&times;</span>
+        <h2>Quiz Divertido</h2>
+        <div class="quiz-score" id="quiz-score">Puntaje: 0</div>
+        <div id="quiz-content" class="content-container"></div>
+      </div>
+    </div>
+    <div id="asistencia-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('asistencia-modal')">&times;</span>
+        <h2>Asistencia</h2>
+        <div id="asistencia-form">
+          <h3>Registrar Asistencia</h3>
+          <input type="text" id="asistencia-nombres" placeholder="Nombres (separados por comas)">
+          <input type="date" id="asistencia-fecha" placeholder="Fecha (YYYY-MM-DD)">
+          <button onclick="addAsistencia()">Registrar</button>
+        </div>
+        <div id="asistencia-stats"></div>
+        <div id="asistencia-content" class="content-container"></div>
+      </div>
+    </div>
+    <div id="instakids-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('instakids-modal')">&times;</span>
+        <h2>InstaKids</h2>
+        <div id="instakids-share-form">
+          <h3>Compartir en InstaKids</h3>
+          <input type="text" id="share-titulo" placeholder="Título">
+          <input type="file" id="share-imagen" accept="image/jpeg,image/png,image/gif">
+          <textarea id="share-descripcion" placeholder="Descripción"></textarea>
+          <button onclick="shareInstakids()">Compartir</button>
+        </div>
+        <div id="instakids-content" class="content-container"></div>
+      </div>
+    </div>
+    <div id="admin-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal('admin-modal')">&times;</span>
+        <h2>Modo Administrador</h2>
+        <p>Contraseña: <input type="password" id="admin-password"><button onclick="loginAdmin()">Entrar</button></p>
+        <div id="admin-form" style="display:none;">
+          <h3>Editar Contenido</h3>
+          <select id="edit-section" onchange="updateAdminForm()">
+            <option value="clases">Clases Bíblicas</option>
+            <option value="historias">Historias (Videos)</option>
+            <option value="quiz">Quiz</option>
+            <option value="versiculo-manual">Versículo Diario</option>
+            <option value="asistencia">Asistencia</option>
+            <option value="instakids">InstaKids</option>
+            <option value="fondo">Fondo de la Aplicación</option>
+          </select>
+          <input type="number" id="edit-index" placeholder="Índice (0 para nuevo)" oninput="fillEditForm()">
+          <div id="admin-inputs"></div>
+          <button onclick="saveContent()">Guardar</button>
+          <button id="delete-btn" onclick="deleteContent()">Eliminar</button>
+          <button id="logout-btn" onclick="logoutAdmin()">Cerrar Sesión</button>
+          <button id="reset-btn" onclick="resetLocalStorage()">Reiniciar Datos</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Estado
+    let currentClassView = 'contenido';
+    let quizScore = parseInt(localStorage.getItem('quizScore')) || 0;
+    let isAdmin = JSON.parse(localStorage.getItem('isAdmin')) || false;
+
+    // Datos iniciales
+    let initialClases = [
+      {
+        titulo: "La Creación",
+        contenido: "Dios creó el mundo en seis días: luz, cielo, tierra, plantas, sol, luna, animales, Adán y Eva. (Génesis 1)",
+        versiculo: "Génesis 1:1 - En el principio creó Dios los cielos y la tierra.",
+        actividades: "1. Dibuja la creación.\n2. Ora agradeciendo por el mundo.",
+        oracion: "Gracias, Dios, por crear este mundo. Amén."
+      }
+    ];
+
+    let initialHistorias = [
+      {
+        titulo: "La Creación",
+        video: "https://www.youtube.com/embed/fN0tFBRMJyE",
+        descripcion: "Un video animado sobre la creación del mundo."
+      }
+    ];
+
+    let initialQuiz = [
+      {
+        pregunta: "¿Quién creó el mundo?",
+        opciones: ["Jesús", "Moisés", "Dios", "Adán"],
+        correcta: "Dios",
+        explicacion: "Dios creó el mundo en seis días, según Génesis 1."
+      }
+    ];
+
+    let initialVersiculosDiarios = [
+      { versiculo: "Juan 3:16 - Porque de tal manera amó Dios al mundo, que ha dado a su Hijo unigénito." }
+    ];
+
+    let initialAsistencia = [
+      { nombre: "Juan Pérez", fecha: "2025-09-23" }
+    ];
+
+    let initialInstakids = [
+      {
+        titulo: "¡Dibujo de la Creación!",
+        imagen: "https://via.placeholder.com/300x200.png?text=Creación",
+        descripcion: "Un niño dibujó el mundo que Dios creó."
+      }
+    ];
+
+    let clases = initialClases;
+    let historias = initialHistorias;
+    let quiz = initialQuiz;
+    let versiculosDiarios = initialVersiculosDiarios;
+    let asistencia = initialAsistencia;
+    let instakids = initialInstakids;
+
+    // Seguridad: Sanitizar entradas
+    function sanitizeInput(input) {
+      if (typeof input !== 'string') return '';
+      const div = document.createElement('div');
+      div.textContent = input;
+      return div.innerHTML.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // Validar imagen
+    function isValidImageURL(url) {
+      return url && (url.startsWith('data:image/') || url.startsWith('http') || url.startsWith('https'));
+    }
+
+    // Refrescar datos de InstaKids
+    function refreshInstakids() {
+      try {
+        console.log('Refrescando datos de instakids...');
+        instakids = JSON.parse(localStorage.getItem('instakids')) || initialInstakids;
+        console.log('Instakids refrescado:', instakids);
+        renderInstakidsHome();
+        renderCurrent('instakids');
+      } catch (error) {
+        console.error('Error en refreshInstakids:', error);
+        instakids = initialInstakids;
+        localStorage.setItem('instakids', JSON.stringify(instakids));
+        renderInstakidsHome();
+        renderCurrent('instakids');
+      }
+    }
+
+    // Inicializar datos
+    function initializeData() {
+      try {
+        console.log('Iniciando initializeData...');
+        try {
+          clases = JSON.parse(localStorage.getItem('clases')) || initialClases;
+        } catch (e) {
+          console.error('Error cargando clases:', e);
+          clases = initialClases;
+        }
+        try {
+          historias = JSON.parse(localStorage.getItem('historias')) || initialHistorias;
+        } catch (e) {
+          console.error('Error cargando historias:', e);
+          historias = initialHistorias;
+        }
+        try {
+          quiz = JSON.parse(localStorage.getItem('quiz')) || initialQuiz;
+        } catch (e) {
+          console.error('Error cargando quiz:', e);
+          quiz = initialQuiz;
+        }
+        try {
+          versiculosDiarios = JSON.parse(localStorage.getItem('versiculosDiarios')) || initialVersiculosDiarios;
+        } catch (e) {
+          console.error('Error cargando versiculosDiarios:', e);
+          versiculosDiarios = initialVersiculosDiarios;
+        }
+        try {
+          asistencia = JSON.parse(localStorage.getItem('asistencia')) || initialAsistencia;
+        } catch (e) {
+          console.error('Error cargando asistencia:', e);
+          asistencia = initialAsistencia;
+        }
+        try {
+          instakids = JSON.parse(localStorage.getItem('instakids')) || initialInstakids;
+        } catch (e) {
+          console.error('Error cargando instakids:', e);
+          instakids = initialInstakids;
+        }
+
+        if (!localStorage.getItem('clases')) localStorage.setItem('clases', JSON.stringify(clases));
+        if (!localStorage.getItem('historias')) localStorage.setItem('historias', JSON.stringify(historias));
+        if (!localStorage.getItem('quiz')) localStorage.setItem('quiz', JSON.stringify(quiz));
+        if (!localStorage.getItem('versiculosDiarios')) localStorage.setItem('versiculosDiarios', JSON.stringify(versiculosDiarios));
+        if (!localStorage.getItem('asistencia')) localStorage.setItem('asistencia', JSON.stringify(asistencia));
+        if (!localStorage.getItem('instakids')) localStorage.setItem('instakids', JSON.stringify(instakids));
+
+        const savedBackground = localStorage.getItem('appBackground');
+        if (savedBackground) document.body.style.backgroundImage = `url(${sanitizeInput(savedBackground)})`;
+
+        console.log('Instakids inicial:', instakids);
+        renderInstakidsHome();
+        renderDailyVerse();
+        renderCurrent('clases');
+        renderAsistenciaStats();
+      } catch (error) {
+        console.error('Error en initializeData:', error);
+        alert('Error al inicializar los datos.');
+      }
+    }
+
+    // Reiniciar localStorage
+    function resetLocalStorage() {
+      try {
+        if (!confirm('¿Estás seguro de reiniciar todos los datos? Esto eliminará todo el contenido guardado.')) return;
+        localStorage.clear();
+        clases = JSON.parse(JSON.stringify(initialClases));
+        historias = JSON.parse(JSON.stringify(initialHistorias));
+        quiz = JSON.parse(JSON.stringify(initialQuiz));
+        versiculosDiarios = JSON.parse(JSON.stringify(initialVersiculosDiarios));
+        asistencia = JSON.parse(JSON.stringify(initialAsistencia));
+        instakids = JSON.parse(JSON.stringify(initialInstakids));
+        quizScore = 0;
+        isAdmin = false;
+        localStorage.setItem('clases', JSON.stringify(clases));
+        localStorage.setItem('historias', JSON.stringify(historias));
+        localStorage.setItem('quiz', JSON.stringify(quiz));
+        localStorage.setItem('versiculosDiarios', JSON.stringify(versiculosDiarios));
+        localStorage.setItem('asistencia', JSON.stringify(asistencia));
+        localStorage.setItem('instakids', JSON.stringify(instakids));
+        localStorage.setItem('quizScore', quizScore);
+        localStorage.setItem('isAdmin', JSON.stringify(isAdmin));
+        localStorage.removeItem('appBackground');
+        localStorage.removeItem('manualVerse');
+        document.body.style.backgroundImage = '';
+        document.getElementById('admin-form').style.display = 'none';
+        refreshInstakids();
+        renderDailyVerse();
+        renderCurrent('clases');
+        renderAsistenciaStats();
+        alert('Datos reiniciados correctamente.');
+      } catch (error) {
+        console.error('Error en resetLocalStorage:', error);
+        alert('Error al reiniciar datos.');
+      }
+    }
+
+    // Versículo Diario
+    function renderDailyVerse() {
+      try {
+        const manualVerse = localStorage.getItem('manualVerse');
+        document.getElementById('daily-verse-text').innerText = manualVerse || versiculosDiarios[0].versiculo;
+      } catch (error) {
+        console.error('Error renderizando versículo:', error);
+        document.getElementById('daily-verse-text').innerText = 'Error al cargar el versículo.';
+      }
+    }
+
+    // Estadísticas de Asistencia
+    function renderAsistenciaStats() {
+      try {
+        const statsContainer = document.getElementById('asistencia-stats');
+        if (!asistencia || asistencia.length === 0) {
+          statsContainer.innerHTML = '<p>No hay datos de asistencia.</p>';
+          return;
+        }
+        const asistenciaPorAlumno = {};
+        asistencia.forEach(item => {
+          asistenciaPorAlumno[item.nombre] = (asistenciaPorAlumno[item.nombre] || 0) + 1;
+        });
+        let statsHTML = `<h3>Estadísticas</h3><p>Total de registros: ${asistencia.length}</p><ul>`;
+        Object.entries(asistenciaPorAlumno).forEach(([alumno, count]) => {
+          statsHTML += `<li>${sanitizeInput(alumno)}: ${count} asistencias</li>`;
+        });
+        statsHTML += '</ul>';
+        statsContainer.innerHTML = statsHTML;
+      } catch (error) {
+        console.error('Error en renderAsistenciaStats:', error);
+        statsContainer.innerHTML = '<p>Error al cargar estadísticas.</p>';
+      }
+    }
+
+    // InstaKids en página principal
+    function renderInstakidsHome() {
+      try {
+        console.log('Iniciando renderInstakidsHome...');
+        const contentContainer = document.getElementById('instakids-home-content');
+        if (!contentContainer) {
+          console.error('Contenedor #instakids-home-content no encontrado.');
+          return;
+        }
+        contentContainer.innerHTML = '';
+        if (!instakids || !Array.isArray(instakids) || instakids.length === 0) {
+          console.log('No hay publicaciones en instakids:', instakids);
+          contentContainer.innerHTML = '<p>No hay publicaciones disponibles.</p>';
+          return;
+        }
+        instakids.forEach((item, index) => {
+          const imagen = isValidImageURL(item.imagen) ? item.imagen : 'https://via.placeholder.com/300x200.png?text=Imagen+no+disponible';
+          console.log(`Renderizando publicación ${index + 1}:`, item.titulo);
+          contentContainer.innerHTML += `
+            <div class="content-card">
+              <h3>${index + 1}. ${sanitizeInput(item.titulo)}</h3>
+              <img src="${sanitizeInput(imagen)}" alt="${sanitizeInput(item.titulo)}" onerror="this.src='https://via.placeholder.com/300x200.png?text=Imagen+no+disponible'">
+              <p>${sanitizeInput(item.descripcion)}</p>
+            </div>`;
+        });
+      } catch (error) {
+        console.error('Error en renderInstakidsHome:', error);
+        document.getElementById('instakids-home-content').innerHTML = '<p>Error al cargar publicaciones.</p>';
+      }
+    }
+
+    // Abrir/Cerrar Modal
+    function openModal(modalId) {
+      try {
+        document.querySelectorAll('.modal').forEach(modal => modal.style.display = 'none');
+        const modal = document.getElementById(modalId + '-modal');
+        if (!modal) return;
+        modal.style.display = 'flex';
+        if (modalId === 'clases') {
+          currentClassView = 'contenido';
+          updateClassButtons();
+          renderCurrent('clases');
+        } else if (modalId === 'quiz') {
+          document.getElementById('quiz-score').innerText = `Puntaje: ${quizScore}`;
+          renderCurrent('quiz');
+        } else if (modalId === 'asistencia') {
+          renderAsistenciaStats();
+          renderCurrent('asistencia');
+        } else if (modalId === 'instakids') {
+          refreshInstakids();
+        } else {
+          renderCurrent(modalId);
+        }
+      } catch (error) {
+        console.error('Error en openModal:', error);
+        alert('Error al abrir el modal.');
+      }
+    }
+
+    function closeModal(modalId) {
+      try {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.style.display = 'none';
+      } catch (error) {
+        console.error('Error en closeModal:', error);
+      }
+    }
+
+    // Clases
+    function showClassContent(view) {
+      try {
+        currentClassView = view;
+        updateClassButtons();
+        renderCurrent('clases');
+      } catch (error) {
+        console.error('Error en showClassContent:', error);
+        alert('Error al mostrar contenido.');
+      }
+    }
+
+    function updateClassButtons() {
+      try {
+        document.getElementById('btn-contenido').classList.toggle('active', currentClassView === 'contenido');
+        document.getElementById('btn-versiculo').classList.toggle('active', currentClassView === 'versiculo');
+        document.getElementById('btn-actividades').classList.toggle('active', currentClassView === 'actividades');
+        document.getElementById('btn-oracion').classList.toggle('active', currentClassView === 'oracion');
+      } catch (error) {
+        console.error('Error en updateClassButtons:', error);
+      }
+    }
+
+    // Renderizar contenido
+    function renderCurrent(section) {
+      try {
+        let contentContainer = document.getElementById(`${section}-content`);
+        let data;
+        if (section === 'clases') data = clases;
+        else if (section === 'historias') data = historias;
+        else if (section === 'quiz') data = quiz;
+        else if (section === 'asistencia') data = asistencia;
+        else if (section === 'instakids') data = instakids;
+        else return;
+
+        contentContainer.innerHTML = '';
+        if (!data || !Array.isArray(data) || data.length === 0) {
+          contentContainer.innerHTML = '<p>No hay contenido disponible.</p>';
+          return;
+        }
+
+        if (section === 'clases') {
+          data.forEach((item, index) => {
+            let cardContent = `<h3>${index + 1}. ${sanitizeInput(item.titulo)}</h3>`;
+            if (currentClassView === 'contenido') {
+              cardContent += `<p>${sanitizeInput(item.contenido)}</p>`;
+            } else if (currentClassView === 'versiculo') {
+              cardContent += `<p><strong>Versículo:</strong> ${sanitizeInput(item.versiculo)}</p>`;
+            } else if (currentClassView === 'actividades') {
+              cardContent += `<h4>Actividades:</h4><p>${sanitizeInput(item.actividades).replace(/\n/g, '<br>')}</p>`;
+            } else if (currentClassView === 'oracion') {
+              cardContent += `<p><strong>Oración:</strong> ${sanitizeInput(item.oracion)}</p>`;
+            }
+            contentContainer.innerHTML += `<div class="content-card">${cardContent}</div>`;
+          });
+        } else if (section === 'historias') {
+          data.forEach((item, index) => {
+            let cardContent = `
+              <h3>${index + 1}. ${sanitizeInput(item.titulo)}</h3>
+              <p>${sanitizeInput(item.descripcion)}</p>
+              <iframe src="${sanitizeInput(item.video)}" frameborder="0" allowfullscreen></iframe>`;
+            contentContainer.innerHTML += `<div class="content-card">${cardContent}</div>`;
+          });
+        } else if (section === 'quiz') {
+          const item = data[0];
+          let cardContent = `<h3>${sanitizeInput(item.pregunta)}</h3><div class="quiz-options">`;
+          item.opciones.forEach(opcion => {
+            cardContent += `<button onclick="checkAnswer(0, '${sanitizeInput(opcion)}', '${sanitizeInput(item.correcta)}', this)">${sanitizeInput(opcion)}</button>`;
+          });
+          cardContent += `</div><div class="quiz-result" id="quiz-result-0"></div>`;
+          contentContainer.innerHTML = `<div class="content-card">${cardContent}</div>`;
+        } else if (section === 'asistencia') {
+          const groupedByDate = {};
+          data.forEach(item => {
+            if (!groupedByDate[item.fecha]) groupedByDate[item.fecha] = [];
+            groupedByDate[item.fecha].push(item.nombre);
+          });
+          Object.keys(groupedByDate).forEach((date, index) => {
+            const names = groupedByDate[date].map(name => `<li>${sanitizeInput(name)}</li>`).join('');
+            let cardContent = `<h3>Fecha: ${sanitizeInput(date)}</h3><ul>${names}</ul>`;
+            contentContainer.innerHTML += `<div class="content-card">${cardContent}</div>`;
+          });
+        } else if (section === 'instakids') {
+          data.forEach((item, index) => {
+            const imagen = isValidImageURL(item.imagen) ? item.imagen : 'https://via.placeholder.com/300x200.png?text=Imagen+no+disponible';
+            console.log(`Renderizando publicación en modal ${index + 1}:`, item.titulo);
+            let cardContent = `
+              <h3>${index + 1}. ${sanitizeInput(item.titulo)}</h3>
+              <img src="${sanitizeInput(imagen)}" alt="${sanitizeInput(item.titulo)}" onerror="this.src='https://via.placeholder.com/300x200.png?text=Imagen+no+disponible'">
+              <p>${sanitizeInput(item.descripcion)}</p>`;
+            contentContainer.innerHTML += `<div class="content-card">${cardContent}</div>`;
+          });
+        }
+      } catch (error) {
+        console.error(`Error en renderCurrent(${section}):`, error);
+        document.getElementById(`${section}-content`).innerHTML = '<p>Error al cargar el contenido.</p>';
+      }
+    }
+
+    // Asistencia
+    function addAsistencia() {
+      try {
+        const nombres = document.getElementById('asistencia-nombres').value.trim().split(',').map(n => sanitizeInput(n.trim())).filter(n => n);
+        const fecha = sanitizeInput(document.getElementById('asistencia-fecha').value.trim());
+        if (!nombres.length || !fecha) {
+          alert('Ingresa al menos un nombre y una fecha.');
+          return;
+        }
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+          alert('Ingresa una fecha válida (YYYY-MM-DD).');
+          return;
+        }
+        nombres.forEach(nombre => asistencia.push({ nombre, fecha }));
+        localStorage.setItem('asistencia', JSON.stringify(asistencia));
+        document.getElementById('asistencia-nombres').value = '';
+        document.getElementById('asistencia-fecha').value = '';
+        renderCurrent('asistencia');
+        renderAsistenciaStats();
+        alert('Asistencia registrada.');
+      } catch (error) {
+        console.error('Error en addAsistencia:', error);
+        alert('Error al registrar asistencia.');
+      }
+    }
+
+    // InstaKids
+    function shareInstakids() {
+      try {
+        console.log('Iniciando shareInstakids...');
+        const titulo = sanitizeInput(document.getElementById('share-titulo').value.trim());
+        const imagenInput = document.getElementById('share-imagen');
+        const descripcion = sanitizeInput(document.getElementById('share-descripcion').value.trim());
+        
+        console.log('Campos:', { titulo, imagen: !!imagenInput.files[0], descripcion });
+        if (!titulo || !imagenInput.files[0] || !descripcion) {
+          console.log('Campos incompletos');
+          alert('Completa todos los campos y selecciona una imagen.');
+          return;
+        }
+        
+        const file = imagenInput.files[0];
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!validTypes.includes(file.type)) {
+          console.log('Archivo no es una imagen válida:', file.type);
+          alert('Selecciona un archivo de imagen válido (jpg, png, gif).');
+          return;
+        }
+        
+        const maxSize = 5 * 1024 * 1024; // 5MB en bytes
+        if (file.size > maxSize) {
+          console.log('Archivo demasiado grande:', file.size);
+          alert('La imagen no debe superar los 5MB.');
+          return;
+        }
+        
+        console.log('Procesando archivo:', file.name, file.size, file.type);
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const imagen = e.target.result;
+            console.log('Imagen cargada:', imagen.slice(0, 50) + '...');
+            instakids.unshift({ titulo, imagen, descripcion });
+            localStorage.setItem('instakids', JSON.stringify(instakids));
+            console.log('Instakids guardado:', instakids);
+            document.getElementById('share-titulo').value = '';
+            document.getElementById('share-imagen').value = '';
+            document.getElementById('share-descripcion').value = '';
+            refreshInstakids();
+            alert('Publicación compartida con éxito.');
+          } catch (error) {
+            console.error('Error en FileReader onload:', error);
+            alert('Error al procesar la imagen: ' + error.message);
+          }
+        };
+        reader.onerror = function(error) {
+          console.error('Error en FileReader:', error);
+          alert('Error al leer la imagen: ' + error.message);
+        };
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error('Error en shareInstakids:', error);
+        alert('Error al compartir publicación: ' + error.message);
+      }
+    }
+
+    // Quiz
+    function checkAnswer(index, selected, correct, button) {
+      try {
+        const resultDiv = document.getElementById(`quiz-result-${index}`);
+        if (selected === correct) {
+          quizScore += 10;
+          resultDiv.innerText = `¡Correcto! ${sanitizeInput(quiz[index].explicacion)}`;
+          button.classList.add('correct');
+        } else {
+          quizScore = 0;
+          resultDiv.innerText = `Incorrecto. ${sanitizeInput(quiz[index].explicacion)}`;
+          button.classList.add('incorrect');
+        }
+        localStorage.setItem('quizScore', quizScore);
+        document.getElementById('quiz-score').innerText = `Puntaje: ${quizScore}`;
+        document.querySelectorAll(`#quiz-content .quiz-options button`).forEach(btn => {
+          btn.disabled = true;
+          if (btn.innerText === correct) btn.classList.add('correct');
+        });
+      } catch (error) {
+        console.error('Error en checkAnswer:', error);
+      }
+    }
+
+    // Admin
+    function loginAdmin() {
+      try {
+        const password = document.getElementById('admin-password').value;
+        if (btoa(password) === 'amVzdXMxMjM=') { // Contraseña: jesus123
+          isAdmin = true;
+          localStorage.setItem('isAdmin', JSON.stringify(isAdmin));
+          document.getElementById('admin-form').style.display = 'block';
+          document.getElementById('admin-password').value = '';
+          updateAdminForm();
+        } else {
+          alert('Contraseña incorrecta');
+          document.getElementById('admin-password').value = '';
+        }
+      } catch (error) {
+        console.error('Error en loginAdmin:', error);
+        alert('Error al iniciar sesión.');
+      }
+    }
+
+    function logoutAdmin() {
+      try {
+        isAdmin = false;
+        localStorage.setItem('isAdmin', JSON.stringify(isAdmin));
+        document.getElementById('admin-form').style.display = 'none';
+        document.getElementById('admin-password').value = '';
+      } catch (error) {
+        console.error('Error en logoutAdmin:', error);
+      }
+    }
+
+    function updateAdminForm() {
+      try {
+        const section = document.getElementById('edit-section').value;
+        const adminInputs = document.getElementById('admin-inputs');
+        adminInputs.innerHTML = '';
+        if (section === 'clases') {
+          adminInputs.innerHTML = `
+            <input type="text" id="edit-titulo" placeholder="Título">
+            <textarea id="edit-contenido" placeholder="Contenido"></textarea>
+            <input type="text" id="edit-versiculo" placeholder="Versículo">
+            <textarea id="edit-actividades" placeholder="Actividades"></textarea>
+            <textarea id="edit-oracion" placeholder="Oración"></textarea>
+          `;
+        } else if (section === 'historias') {
+          adminInputs.innerHTML = `
+            <input type="text" id="edit-titulo" placeholder="Título del video">
+            <input type="text" id="edit-video" placeholder="URL del video (YouTube)">
+            <textarea id="edit-descripcion" placeholder="Descripción"></textarea>
+          `;
+        } else if (section === 'quiz') {
+          adminInputs.innerHTML = `
+            <input type="text" id="edit-pregunta" placeholder="Pregunta">
+            <input type="text" id="edit-opciones" placeholder="Opciones (separadas por comas)">
+            <input type="text" id="edit-correcta" placeholder="Respuesta correcta">
+            <textarea id="edit-explicacion" placeholder="Explicación"></textarea>
+          `;
+        } else if (section === 'versiculo-manual') {
+          adminInputs.innerHTML = `
+            <input type="text" id="edit-versiculo-manual" placeholder="Versículo para mostrar hoy">
+          `;
+        } else if (section === 'asistencia') {
+          adminInputs.innerHTML = `
+            <input type="text" id="edit-nombres" placeholder="Nombres (separados por comas)">
+            <input type="date" id="edit-fecha" placeholder="Fecha (YYYY-MM-DD)">
+          `;
+        } else if (section === 'instakids') {
+          adminInputs.innerHTML = `
+            <input type="text" id="edit-titulo" placeholder="Título">
+            <input type="file" id="edit-imagen" accept="image/jpeg,image/png,image/gif">
+            <textarea id="edit-descripcion" placeholder="Descripción"></textarea>
+            <img id="edit-imagen-preview" style="display:none; max-width:100%; margin:10px 0;" alt="Vista previa">
+          `;
+          document.getElementById('edit-imagen')?.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file && ['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                document.getElementById('edit-imagen-preview').src = e.target.result;
+                document.getElementById('edit-imagen-preview').style.display = 'block';
+              };
+              reader.onerror = function(error) {
+                console.error('Error en FileReader (admin preview):', error);
+                alert('Error al previsualizar la imagen.');
+              };
+              reader.readAsDataURL(file);
+            }
+          });
+        } else if (section === 'fondo') {
+          adminInputs.innerHTML = `
+            <input type="file" id="edit-fondo" accept="image/jpeg,image/png,image/gif">
+            <img id="fondo-preview" style="display:none; max-width:100%; margin:10px 0;" alt="Vista previa del fondo">
+          `;
+          document.getElementById('edit-fondo')?.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file && ['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                document.getElementById('fondo-preview').src = e.target.result;
+                document.getElementById('fondo-preview').style.display = 'block';
+              };
+              reader.onerror = function(error) {
+                console.error('Error en FileReader (fondo preview):', error);
+                alert('Error al previsualizar el fondo.');
+              };
+              reader.readAsDataURL(file);
+            }
+          });
+        }
+        fillEditForm();
+      } catch (error) {
+        console.error('Error en updateAdminForm:', error);
+      }
+    }
+
+    function fillEditForm() {
+      try {
+        const section = document.getElementById('edit-section').value;
+        const index = parseInt(document.getElementById('edit-index').value) || 0;
+        if (section === 'clases' && index > 0 && index <= clases.length) {
+          const item = clases[index - 1];
+          document.getElementById('edit-titulo').value = item.titulo;
+          document.getElementById('edit-contenido').value = item.contenido;
+          document.getElementById('edit-versiculo').value = item.versiculo;
+          document.getElementById('edit-actividades').value = item.actividades;
+          document.getElementById('edit-oracion').value = item.oracion;
+        } else if (section === 'historias' && index > 0 && index <= historias.length) {
+          const item = historias[index - 1];
+          document.getElementById('edit-titulo').value = item.titulo;
+          document.getElementById('edit-video').value = item.video;
+          document.getElementById('edit-descripcion').value = item.descripcion;
+        } else if (section === 'quiz' && index > 0 && index <= quiz.length) {
+          const item = quiz[index - 1];
+          document.getElementById('edit-pregunta').value = item.pregunta;
+          document.getElementById('edit-opciones').value = item.opciones.join(',');
+          document.getElementById('edit-correcta').value = item.correcta;
+          document.getElementById('edit-explicacion').value = item.explicacion;
+        } else if (section === 'versiculo-manual') {
+          const manualVerse = localStorage.getItem('manualVerse') || versiculosDiarios[0].versiculo;
+          document.getElementById('edit-versiculo-manual').value = manualVerse;
+        } else if (section === 'asistencia' && index > 0 && index <= asistencia.length) {
+          const item = asistencia[index - 1];
+          document.getElementById('edit-nombres').value = item.nombre;
+          document.getElementById('edit-fecha').value = item.fecha;
+        } else if (section === 'instakids' && index > 0 && index <= instakids.length) {
+          const item = instakids[index - 1];
+          document.getElementById('edit-titulo').value = item.titulo;
+          document.getElementById('edit-descripcion').value = item.descripcion;
+          document.getElementById('edit-imagen-preview').src = item.imagen;
+          document.getElementById('edit-imagen-preview').style.display = 'block';
+        } else if (section === 'fondo') {
+          const savedBackground = localStorage.getItem('appBackground') || '';
+          document.getElementById('fondo-preview').src = savedBackground;
+          document.getElementById('fondo-preview').style.display = savedBackground ? 'block' : 'none';
+        }
+      } catch (error) {
+        console.error('Error en fillEditForm:', error);
+      }
+    }
+
+    function deleteContent() {
+      try {
+        const section = document.getElementById('edit-section').value;
+        const index = parseInt(document.getElementById('edit-index').value) || 0;
+        if (index <= 0 || (section !== 'versiculo-manual' && index > eval(section).length)) {
+          alert('Selecciona un índice válido.');
+          return;
+        }
+        if (!confirm(`¿Estás seguro de eliminar este contenido de ${section}?`)) return;
+        if (section === 'clases') {
+          clases.splice(index - 1, 1);
+          localStorage.setItem('clases', JSON.stringify(clases));
+          renderCurrent('clases');
+        } else if (section === 'historias') {
+          historias.splice(index - 1, 1);
+          localStorage.setItem('historias', JSON.stringify(historias));
+          renderCurrent('historias');
+        } else if (section === 'quiz') {
+          quiz.splice(index - 1, 1);
+          localStorage.setItem('quiz', JSON.stringify(quiz));
+          renderCurrent('quiz');
+        } else if (section === 'asistencia') {
+          asistencia.splice(index - 1, 1);
+          localStorage.setItem('asistencia', JSON.stringify(asistencia));
+          renderCurrent('asistencia');
+          renderAsistenciaStats();
+        } else if (section === 'instakids') {
+          instakids.splice(index - 1, 1);
+          localStorage.setItem('instakids', JSON.stringify(instakids));
+          refreshInstakids();
+        } else if (section === 'versiculo-manual') {
+          localStorage.removeItem('manualVerse');
+          renderDailyVerse();
+        }
+        alert('Contenido eliminado.');
+        updateAdminForm();
+      } catch (error) {
+        console.error('Error en deleteContent:', error);
+        alert('Error al eliminar contenido.');
+      }
+    }
+
+    function saveContent() {
+      try {
+        const section = document.getElementById('edit-section').value;
+        const index = parseInt(document.getElementById('edit-index').value) || 0;
+        let data;
+        if (section === 'clases') {
+          data = {
+            titulo: sanitizeInput(document.getElementById('edit-titulo').value.trim()),
+            contenido: sanitizeInput(document.getElementById('edit-contenido').value.trim()),
+            versiculo: sanitizeInput(document.getElementById('edit-versiculo').value.trim()),
+            actividades: sanitizeInput(document.getElementById('edit-actividades').value.trim()),
+            oracion: sanitizeInput(document.getElementById('edit-oracion').value.trim())
+          };
+          if (!data.titulo || !data.contenido || !data.versiculo || !data.actividades || !data.oracion) {
+            alert('Completa todos los campos.');
+            return;
+          }
+          if (index === 0) clases.push(data);
+          else clases[index - 1] = data;
+          localStorage.setItem('clases', JSON.stringify(clases));
+          renderCurrent('clases');
+        } else if (section === 'historias') {
+          data = {
+            titulo: sanitizeInput(document.getElementById('edit-titulo').value.trim()),
+            video: sanitizeInput(document.getElementById('edit-video').value.trim()),
+            descripcion: sanitizeInput(document.getElementById('edit-descripcion').value.trim())
+          };
+          if (!data.titulo || !data.video || !data.descripcion) {
+            alert('Completa todos los campos.');
+            return;
+          }
+          if (!/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\/.+$/.test(data.video)) {
+            alert('Ingresa una URL válida de YouTube.');
+            return;
+          }
+          if (index === 0) historias.push(data);
+          else historias[index - 1] = data;
+          localStorage.setItem('historias', JSON.stringify(historias));
+          renderCurrent('historias');
+        } else if (section === 'quiz') {
+          data = {
+            pregunta: sanitizeInput(document.getElementById('edit-pregunta').value.trim()),
+            opciones: document.getElementById('edit-opciones').value.split(',').map(opt => sanitizeInput(opt.trim())).filter(opt => opt),
+            correcta: sanitizeInput(document.getElementById('edit-correcta').value.trim()),
+            explicacion: sanitizeInput(document.getElementById('edit-explicacion').value.trim())
+          };
+          if (!data.pregunta || data.opciones.length < 2 || !data.correcta || !data.explicacion) {
+            alert('Completa todos los campos y asegúrate de tener al menos 2 opciones.');
+            return;
+          }
+          if (!data.opciones.includes(data.correcta)) {
+            alert('La respuesta correcta debe estar entre las opciones.');
+            return;
+          }
+          if (index === 0) quiz.push(data);
+          else quiz[index - 1] = data;
+          localStorage.setItem('quiz', JSON.stringify(quiz));
+          renderCurrent('quiz');
+        } else if (section === 'versiculo-manual') {
+          const versiculo = sanitizeInput(document.getElementById('edit-versiculo-manual').value.trim());
+          if (!versiculo) {
+            alert('Ingresa un versículo.');
+            return;
+          }
+          localStorage.setItem('manualVerse', versiculo);
+          renderDailyVerse();
+        } else if (section === 'asistencia') {
+          const nombres = document.getElementById('edit-nombres').value.trim().split(',').map(n => sanitizeInput(n.trim())).filter(n => n);
+          const fecha = sanitizeInput(document.getElementById('edit-fecha').value.trim());
+          if (!nombres.length || !fecha) {
+            alert('Ingresa al menos un nombre y una fecha.');
+            return;
+          }
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+            alert('Ingresa una fecha válida (YYYY-MM-DD).');
+            return;
+          }
+          if (index === 0) {
+            nombres.forEach(nombre => asistencia.push({ nombre, fecha }));
+          } else {
+            asistencia[index - 1] = { nombre: nombres[0], fecha };
+          }
+          localStorage.setItem('asistencia', JSON.stringify(asistencia));
+          renderCurrent('asistencia');
+          renderAsistenciaStats();
+        } else if (section === 'instakids') {
+          const titulo = sanitizeInput(document.getElementById('edit-titulo').value.trim());
+          const descripcion = sanitizeInput(document.getElementById('edit-descripcion').value.trim());
+          const imagenInput = document.getElementById('edit-imagen');
+          if (!titulo || !descripcion) {
+            alert('Completa todos los campos.');
+            return;
+          }
+          if (index === 0 && !imagenInput.files[0]) {
+            alert('Selecciona una imagen.');
+            return;
+          }
+          if (imagenInput.files[0]) {
+            const file = imagenInput.files[0];
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            if (!validTypes.includes(file.type)) {
+              alert('Selecciona un archivo de imagen válido (jpg, png, gif).');
+              return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+              alert('La imagen no debe superar los 5MB.');
+              return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              try {
+                const imagen = e.target.result;
+                data = { titulo, imagen, descripcion };
+                if (index === 0) instakids.unshift(data);
+                else instakids[index - 1] = data;
+                localStorage.setItem('instakids', JSON.stringify(instakids));
+                refreshInstakids();
+                closeModal('admin-modal');
+                alert('Publicación guardada.');
+              } catch (error) {
+                console.error('Error en FileReader onload (admin):', error);
+                alert('Error al procesar la imagen: ' + error.message);
+              }
+            };
+            reader.onerror = function(error) {
+              console.error('Error en FileReader (admin):', error);
+              alert('Error al leer la imagen: ' + error.message);
+            };
+            reader.readAsDataURL(file);
+          } else {
+            data = { titulo, descripcion, imagen: instakids[index - 1].imagen };
+            instakids[index - 1] = data;
+            localStorage.setItem('instakids', JSON.stringify(instakids));
+            refreshInstakids();
+            closeModal('admin-modal');
+            alert('Publicación guardada.');
+          }
+          return;
+        } else if (section === 'fondo') {
+          const fondoInput = document.getElementById('edit-fondo');
+          if (!fondoInput.files[0]) {
+            alert('Selecciona una imagen de fondo.');
+            return;
+          }
+          const file = fondoInput.files[0];
+          const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+          if (!validTypes.includes(file.type)) {
+            alert('Selecciona un archivo de imagen válido (jpg, png, gif).');
+            return;
+          }
+          if (file.size > 5 * 1024 * 1024) {
+            alert('La imagen no debe superar los 5MB.');
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const fondo = e.target.result;
+            localStorage.setItem('appBackground', fondo);
+            document.body.style.backgroundImage = `url(${fondo})`;
+            closeModal('admin-modal');
+            alert('Fondo actualizado.');
+          };
+          reader.onerror = function(error) {
+            console.error('Error en FileReader (fondo):', error);
+            alert('Error al leer el fondo: ' + error.message);
+          };
+          reader.readAsDataURL(file);
+          return;
+        }
+        closeModal('admin-modal');
+        alert('Contenido guardado.');
+      } catch (error) {
+        console.error('Error en saveContent:', error);
+        alert('Error al guardar: ' + error.message);
+      }
+    }
+
+    // Inicializar
+    initializeData();
+  </script>
+</body>
+</html>
